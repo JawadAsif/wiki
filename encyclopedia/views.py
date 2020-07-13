@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from . import markdown2
 from . import util
 
 
@@ -12,6 +12,7 @@ def index(request):
 def entry(request, title):
     entry = util.get_entry(title)
     if entry:
+        entry = markdown2.markdown(entry)
         return render(request, "encyclopedia/entry.html", {
             "entry": entry
         })
