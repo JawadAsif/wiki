@@ -22,16 +22,20 @@ def entry(request, title):
 
 def search(request):
     if request.method == "POST":
-        print("here")
         searched_text = request.POST["q"]
-        print(searched_text)
-        entries = [entry.lower() for entry in util.list_entries()]
-        print(entries)
+        # searched_text_lower = searched_text.lower()
+        # print(searched_text)
+        entries = util.list_entries()
+        # entries_lower = [entry.lower() for entry in entries]
+        # print(entries)
+        # if searched_text_lower in entries_lower:
         if searched_text in entries:
-            return HttpResponseRedirect(reverse("entry",kwargs={'title': searched_text}))
+            return HttpResponseRedirect(reverse("entry", kwargs={'title': searched_text}))
         else:
-            result = [s for s in entries if searched_text in s]
-            print(result)
+            # results = [s.capitalize() for s in entries_lower if searched_text_lower in s]
+            results = [s for s in entries if searched_text in s]
+            # print(results)
             return render(request, "encyclopedia/searched_result.html", {
-                          "results": result
+                          "results": results,
+                          "searched_text": searched_text
                           })
