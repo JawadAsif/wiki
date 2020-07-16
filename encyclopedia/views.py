@@ -55,9 +55,9 @@ def search(request):
         # print(entries)
         # if searched_text_lower in entries_lower:
         if searched_text in entries:
-            return HttpResponseRedirect
-            (reverse("entry",
-                     kwargs={'title': searched_text}))
+            return HttpResponseRedirect(reverse("entry",
+                                                kwargs={'title': searched_text}
+                                                ))
         else:
             # results = [s.capitalize() for s in entries_lower \
             # if searched_text_lower in s]
