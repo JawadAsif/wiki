@@ -1,6 +1,13 @@
-from django.shortcuts import render, HttpResponseRedirect, reverse
-from . import markdown2
 from . import util
+from . import markdown2
+from django.shortcuts import render, HttpResponseRedirect, reverse, \
+    HttpResponse
+from django import forms
+
+
+class NewEntryForm(forms.Form):
+    title = forms.CharField(label="title")
+    content = forms.CharField(label="content", widget=forms.Textarea)
 
 
 def index(request):
@@ -30,12 +37,33 @@ def search(request):
         # print(entries)
         # if searched_text_lower in entries_lower:
         if searched_text in entries:
-            return HttpResponseRedirect(reverse("entry", kwargs={'title': searched_text}))
+            return HttpResponseRedirect
+            (reverse("entry",
+                     kwargs={'title': searched_text}))
         else:
-            # results = [s.capitalize() for s in entries_lower if searched_text_lower in s]
+            # results = [s.capitalize() for s in entries_lower \
+            # if searched_text_lower in s]
             results = [s for s in entries if searched_text in s]
             # print(results)
             return render(request, "encyclopedia/searched_result.html", {
                           "results": results,
                           "searched_text": searched_text
                           })
+
+
+def add(request):
+    if request.method == "POST":
+        form = NewEntryForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            print(title)
+            content = form.cleaned_data["content"]
+            print(content)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(request, "encyclopedia/add.html", {
+                "form": form
+            })
+    return render(request, "encyclopedia/add.html", {
+        "form": NewEntryForm()
+    })

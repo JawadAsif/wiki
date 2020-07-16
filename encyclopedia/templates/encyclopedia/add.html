@@ -1,0 +1,53 @@
+{% extends 'encyclopedia/layout.html' %}
+{% block title %}
+Encyclopedia
+{% endblock %}
+
+{% block body %}
+<!-- <form action="{% url 'add' %}" method="POST">
+    <div class="col-lg-1 col-md-1">
+        <h4>Title:</h4>
+    </div>
+    <div class="col-lg-3 col-md-3">
+        <input type="text" name="title"></input>
+    </div>
+    <div class="col-lg-1 col-md-1">
+        <h4>Content:</h4>
+    </div>
+    <div class="col-lg-12 col-md-12">
+        <textarea name="content"></textarea>
+    </div>
+    <div class="col-lg-1 col-md-1">
+        <input type="submit" value="Save">
+    </div>
+
+</form> -->
+<!-- <form action="{% url 'add' %}" method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <div class="col-lg-1 col-md-1">
+        <input type="submit" value="Save">
+    </div>
+</form> -->
+<form action="{% url 'add' %}" method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.title.errors }}
+    <div class="col-lg-1 col-md-1">
+        <h4 id="{{ form.title.label }}">Title: </h4>
+    </div>
+    <div class="col-lg-3 col-md-3">
+        {{ form.title }}
+    </div>
+    {{ form.content.errors}}
+    <div class="col-lg-1 col-md-1">
+        <h4 id="{{ form.content.label }}">Content: </h4>
+    </div>
+    <div class="col-lg-12 col-md-12">
+        {{ form.content }}
+    </div>
+    <div class="col-lg-1 col-md-1">
+        <input type="submit" value="Save">
+    </div>
+</form>
+{% endblock %}
