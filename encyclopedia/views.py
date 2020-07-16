@@ -6,18 +6,18 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 
-class NewTitle(forms.CharField):
+# class NewTitle(forms.CharField):
 
-    def validate(self, value):
-        """Check if title already exists"""
-        # Use the parent's handling of required fields, etc.
-        super().validate(value)
-        if value in util.list_entries():
-            raise ValidationError("Tittle already exists", code='invalid')
+#     def validate(self, value):
+#         """Check if title already exists"""
+#         # Use the parent's handling of required fields, etc.
+#         super().validate(value)
+#         if value in util.list_entries():
+#             raise ValidationError("Title already exists", code='invalid')
 
 
 class NewEntryForm(forms.Form):
-    title = NewTitle(label="title")
+    title = forms.CharField(label="title")
     content = forms.CharField(label="content", widget=forms.Textarea)
 
 
@@ -37,7 +37,8 @@ def entry(request, title):
     if entry:
         entry = markdown2.markdown(entry)
         return render(request, "encyclopedia/entry.html", {
-            "entry": entry
+            "entry": entry,
+            "title": title
         })
     else:
         return render(request, "encyclopedia/entry_not_found.html")
@@ -72,6 +73,11 @@ def add(request):
         form = NewEntryForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data["title"]
+            if title in util.list_entries():
+                return render(request, "encyclopedia/add.html", {
+                    "form": form,
+                    "title_exists": "Title already exists!"
+                })
             content = form.cleaned_data["content"]
             save_file_with_entry(title, content)
             return HttpResponseRedirect(reverse("entry",
@@ -85,3 +91,31 @@ def add(request):
     return render(request, "encyclopedia/add.html", {
         "form": NewEntryForm()
     })
+
+
+def edit(request, title):
+    if request.method == "POST":
+        form = NewEntryForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            save_file_with_entry(title, content)
+            return HttpResponseRedirect(reverse("entry",
+                                                kwargs={
+                                                    'title': title
+                                                }))
+        else:
+            return render(request, "encyclopedia/edit.html", {
+                "form": form
+            })
+    else:
+        entry = util.get_entry(title)
+        if entry:
+            form = NewEntryForm()
+            form.fields['title'].initial = title
+            form.fields['content'].initial = entry
+            return render(request, "encyclopedia/edit.html", {
+                "form": form
+            })
+        else:
+            return render(request, "encyclopedia/entry_not_found.html")

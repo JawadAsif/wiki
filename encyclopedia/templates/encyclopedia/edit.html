@@ -5,25 +5,22 @@ Encyclopedia
 
 {% block body %}
 
-<form action="{% url 'add' %}" method="POST">
+<form action="{% url 'edit' form.title %}" method="POST">
     {% csrf_token %}
     <div class="col-lg-3 col-md-3" style="color: red;">
         {{ form.non_field_errors }}
+
+    </div>
+    <div style="display: none;">
         {{ form.title.errors }}
+        <div class="col-lg-1 col-md-1">
+            <h4 id="{{ form.title.label }}">Title: </h4>
+        </div>
+        <div class="col-lg-3 col-md-3">
+            {{ form.title }}
+        </div>
     </div>
 
-    {% if title_exists %}
-    <div class="col-lg-3 col-md-3" style="color: red;">
-        {{ title_exists }}
-    </div>
-    {% endif %}
-
-    <div class="col-lg-1 col-md-1">
-        <h4 id="{{ form.title.label }}">Title: </h4>
-    </div>
-    <div class="col-lg-3 col-md-3">
-        {{ form.title }}
-    </div>
     {{ form.content.errors}}
     <div class="col-lg-1 col-md-1">
         <h4 id="{{ form.content.label }}">Content: </h4>
