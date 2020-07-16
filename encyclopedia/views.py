@@ -4,6 +4,7 @@ from django.shortcuts import render, HttpResponseRedirect, reverse, \
     HttpResponse
 from django import forms
 from django.core.exceptions import ValidationError
+import random
 
 
 # class NewTitle(forms.CharField):
@@ -119,3 +120,12 @@ def edit(request, title):
             })
         else:
             return render(request, "encyclopedia/entry_not_found.html")
+
+
+def random_entry(request):
+    entries = util.list_entries()
+    random_int = random.randint(0, len(entries)-1)
+    entry = entries[random_int]
+    return HttpResponseRedirect(reverse("entry", kwargs={
+        'title': entry
+    }))
