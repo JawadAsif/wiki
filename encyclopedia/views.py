@@ -3,11 +3,27 @@ from . import markdown2
 from django.shortcuts import render, HttpResponseRedirect, reverse, \
     HttpResponse
 from django import forms
+from django.core.exceptions import ValidationError
+
+
+class NewTitle(forms.CharField):
+
+    def validate(self, value):
+        """Check if title already exists"""
+        # Use the parent's handling of required fields, etc.
+        super().validate(value)
+        if value in util.list_entries():
+            raise ValidationError("Tittle already exists", code='invalid')
 
 
 class NewEntryForm(forms.Form):
-    title = forms.CharField(label="title")
+    title = NewTitle(label="title")
     content = forms.CharField(label="content", widget=forms.Textarea)
+
+
+def save_file_with_entry(title, content):
+    with open(f"entries/{title}.md", "w") as file:
+        file.write(content)
 
 
 def index(request):
@@ -56,10 +72,12 @@ def add(request):
         form = NewEntryForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data["title"]
-            print(title)
             content = form.cleaned_data["content"]
-            print(content)
-            return HttpResponseRedirect(reverse("index"))
+            save_file_with_entry(title, content)
+            return HttpResponseRedirect(reverse("entry",
+                                                kwargs={
+                                                    'title': title
+                                                }))
         else:
             return render(request, "encyclopedia/add.html", {
                 "form": form
